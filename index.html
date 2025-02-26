@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Avaliação Open Roberta</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">Avaliação Open Roberta</a>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <h2 class="text-center">Rubrica de Avaliação</h2>
+        <div class="mb-3">
+            <label class="form-label">Nome do Participante:</label>
+            <input type="text" id="nomeParticipante" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Nome do Avaliador:</label>
+            <input type="text" id="nomeAvaliador" class="form-control">
+        </div>
+        <table class="table table-bordered table-striped mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>Critério</th>
+                    <th>Começando (1 pt)</th>
+                    <th>Desenvolvimento (2 pts)</th>
+                    <th>Realizado (3 pts)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Domínio de Sala - Gerenciamento de tempo, foco e interação.</td>
+                    <td><input type="radio" name="dominio" value="1" onclick="calcularNota()"></td>
+                    <td><input type="radio" name="dominio" value="2" onclick="calcularNota()"></td>
+                    <td><input type="radio" name="dominio" value="3" onclick="calcularNota()"></td>
+                </tr>
+                <tr>
+                    <td>Compreensão da Programação - Aplicação de conceitos básicos no Open Roberta.</td>
+                    <td><input type="radio" name="programacao" value="1" onclick="calcularNota()"></td>
+                    <td><input type="radio" name="programacao" value="2" onclick="calcularNota()"></td>
+                    <td><input type="radio" name="programacao" value="3" onclick="calcularNota()"></td>
+                </tr>
+                <tr>
+                    <td>Uso de Blocos e Lógica - Criação de scripts coerentes e funcionais.</td>
+                    <td><input type="radio" name="blocos" value="1" onclick="calcularNota()"></td>
+                    <td><input type="radio" name="blocos" value="2" onclick="calcularNota()"></td>
+                    <td><input type="radio" name="blocos" value="3" onclick="calcularNota()"></td>
+                </tr>
+                <tr>
+                    <td>Conhecimento em Robótica - Aplicação dos princípios básicos de robótica.</td>
+                    <td><input type="radio" name="robotica" value="1" onclick="calcularNota()"></td>
+                    <td><input type="radio" name="robotica" value="2" onclick="calcularNota()"></td>
+                    <td><input type="radio" name="robotica" value="3" onclick="calcularNota()"></td>
+                </tr>
+                <tr>
+                    <td>Testes e Ajustes - Capacidade de testar e corrigir erros.</td>
+                    <td><input type="radio" name="testes" value="1" onclick="calcularNota()"></td>
+                    <td><input type="radio" name="testes" value="2" onclick="calcularNota()"></td>
+                    <td><input type="radio" name="testes" value="3" onclick="calcularNota()"></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="mb-3">
+            <label class="form-label">Observações:</label>
+            <textarea id="observacoes" class="form-control" rows="3"></textarea>
+        </div>
+        <h4 class="text-center">Nota Total: <span id="notaTotal">0</span> pts</h4>
+        <div class="text-center">
+            <button class="btn btn-primary" onclick="salvarPDF()">Salvar em PDF</button>
+        </div>
+    </div>
+    <script>
+        function calcularNota() {
+            let total = 0;
+            let radios = document.querySelectorAll('input[type="radio"]:checked');
+            radios.forEach(radio => {
+                total += parseInt(radio.value);
+            });
+            document.getElementById('notaTotal').innerText = total;
+        }
+        
+        function salvarPDF() {
+            const { jsPDF } = window.jspdf;
+            let doc = new jsPDF();
+            doc.setFontSize(10);
+            let nomeParticipante = document.getElementById('nomeParticipante').value;
+            let nomeAvaliador = document.getElementById('nomeAvaliador').value;
+            let notaTotal = document.getElementById('notaTotal').innerText;
+            let observacoes = document.getElementById('observacoes').value;
+            
+            doc.text("Avaliação Open Roberta", 10, 10);
+            doc.text("Nome do Participante: " + nomeParticipante, 10, 20);
+            doc.text("Nome do Avaliador: " + nomeAvaliador, 10, 30);
+            doc.text("Nota Total: " + notaTotal + " pts", 10, 40);
+            doc.text("Detalhamento das Notas:", 10, 50);
+            
+            let criterios = document.querySelectorAll('tbody tr');
+            let y = 60;
+            criterios.forEach(tr => {
+                let criterio = tr.cells[0].innerText;
+                let nota = tr.querySelector('input[type="radio"]:checked');
+                let valorNota = nota ? nota.value : "Não avaliado";
+                doc.text(criterio + " - Nota: " + valorNota, 10, y);
+                y += 7;
+            });
+            
+            doc.text("Observações:", 10, y + 10);
+            doc.text(observacoes, 10, y + 20, { maxWidth: 180 });
+            
+            doc.save("avaliacao_open_roberta.pdf");
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
